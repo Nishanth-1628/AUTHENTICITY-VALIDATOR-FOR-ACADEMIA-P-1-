@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Authenticity Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="page-content app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> Auth Validator</div>
+    <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="upload.html"><i class="fa-solid fa-upload"></i> Upload</a>
+    <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    <div class="sidebar-section-label">Admin</div>
+    <a href="admin.html" class="active"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+    <a href="#" onclick="logout()" style="color:var(--danger);margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main-panel">
+    <div class="topbar">
+      <div class="flex items-center gap-2">
+        <button class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2>Admin Panel</h2>
+      </div>
+      <div class="user-chip" data-user-chip></div>
+    </div>
+
+    <div class="panel-body">
+      <div id="access-denied" class="glass-card hidden text-center" style="padding:60px;">
+        <i class="fa-solid fa-lock" style="font-size:2rem;color:var(--danger);"></i>
+        <h3>Admin access required</h3>
+        <p class="text-dim">This page is only visible to Admin and Super Admin accounts.</p>
+      </div>
+
+      <div id="admin-content" class="hidden">
+        <div class="grid grid-4 mb-3">
+          <div class="glass-card stat-card"><div class="icon" style="background:rgba(0,229,255,0.15);color:var(--primary);"><i class="fa-solid fa-file"></i></div><div><div class="value" id="a-total">–</div><div class="label">Platform Documents</div></div></div>
+          <div class="glass-card stat-card"><div class="icon" style="background:rgba(123,47,247,0.15);color:var(--secondary);"><i class="fa-solid fa-users"></i></div><div><div class="value" id="a-users">–</div><div class="label">Total Users</div></div></div>
+          <div class="glass-card stat-card"><div class="icon" style="background:rgba(0,255,179,0.15);color:var(--accent);"><i class="fa-solid fa-building-columns"></i></div><div><div class="value" id="a-universities">–</div><div class="label">Universities</div></div></div>
+          <div class="glass-card stat-card"><div class="icon" style="background:rgba(255,176,32,0.15);color:var(--warning);"><i class="fa-solid fa-certificate"></i></div><div><div class="value" id="a-certificates">–</div><div class="label">Certificates</div></div></div>
+        </div>
+
+        <div class="glass-card mb-3">
+          <h3 style="margin-top:0;">Platform Analytics</h3>
+          <canvas id="adminChart" height="180"></canvas>
+        </div>
+
+        <div class="glass-card">
+          <h3 style="margin-top:0;">All Users</h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>University</th><th>Verified</th><th>Joined</th></tr></thead>
+              <tbody id="users-body"><tr><td colspan="6" class="text-dim">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  requireAuth();
+  initNavbarUser();
+
+  const user = getUser();
+  if (!user || !["admin", "super_admin"].includes(user.role)) {
+    document.getElementById("access-denied").classList.remove("hidden");
+  } else {
+    document.getElementById("admin-content").classList.remove("hidden");
+    loadAdmin();
+  }
+
+  async function loadAdmin() {
+    const { ok, data } = await Api.stats();
+    if (ok) {
+      const s = data.stats;
+      document.getElementById("a-total").textContent = s.total_documents;
+      document.getElementById("a-users").textContent = s.total_users ?? "–";
+      document.getElementById("a-universities").textContent = s.total_universities ?? "–";
+      document.getElementById("a-certificates").textContent = s.certificates;
+
+      new Chart(document.getElementById("adminChart"), {
+        type: "doughnut",
+        data: {
+          labels: ["Verified", "Rejected", "Pending"],
+          datasets: [{ data: [s.verified, s.rejected, s.pending], backgroundColor: ["#00ffb3", "#ff4d6d", "#ffb020"] }],
+        },
+        options: { plugins: { legend: { labels: { color: "#9aa3c7" } } } },
+      });
+    }
+
+    const usersRes = await Api.adminUsers();
+    const tbody = document.getElementById("users-body");
+    if (usersRes.ok && usersRes.data.users.length) {
+      tbody.innerHTML = usersRes.data.users.map(u => `
+        <tr>
+          <td>${u.full_name}</td>
+          <td>${u.email}</td>
+          <td style="text-transform:capitalize;">${u.role.replace("_"," ")}</td>
+          <td>${u.university || "—"}</td>
+          <td>${u.is_verified ? '<span class="badge badge-verified">Yes</span>' : '<span class="badge badge-pending">No</span>'}</td>
+          <td class="text-dim small">${new Date(u.created_at).toLocaleDateString()}</td>
+        </tr>`).join("");
+    } else {
+      tbody.innerHTML = `<tr><td colspan="6" class="text-dim">No users found.</td></tr>`;
+    }
+  }
+</script>
+</body>
+</html>

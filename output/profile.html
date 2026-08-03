@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — Authenticity Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="page-content app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> Auth Validator</div>
+    <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="upload.html"><i class="fa-solid fa-upload"></i> Upload</a>
+    <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="profile.html" class="active"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="#" onclick="logout()" style="color:var(--danger);margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main-panel">
+    <div class="topbar">
+      <div class="flex items-center gap-2">
+        <button class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2>Profile</h2>
+      </div>
+      <div class="user-chip" data-user-chip></div>
+    </div>
+
+    <div class="panel-body">
+      <div class="glass-card" style="max-width:520px;">
+        <div class="text-center mb-3">
+          <div class="avatar" style="width:80px;height:80px;font-size:2rem;margin:0 auto 14px;" id="big-avatar"></div>
+          <h3 id="profile-name"></h3>
+          <p class="text-dim small" id="profile-role" style="text-transform:capitalize;"></p>
+        </div>
+        <div class="form-group"><label>Full Name</label><input type="text" id="p-name" disabled></div>
+        <div class="form-group"><label>Email</label><input type="email" id="p-email" disabled></div>
+        <div class="form-group"><label>University</label><input type="text" id="p-university" disabled></div>
+        <div class="form-group"><label>Account Verified</label><input type="text" id="p-verified" disabled></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  requireAuth();
+  initNavbarUser();
+  const user = getUser();
+  if (user) {
+    document.getElementById("big-avatar").textContent = user.full_name.charAt(0).toUpperCase();
+    document.getElementById("profile-name").textContent = user.full_name;
+    document.getElementById("profile-role").textContent = user.role.replace("_", " ");
+    document.getElementById("p-name").value = user.full_name;
+    document.getElementById("p-email").value = user.email;
+    document.getElementById("p-university").value = user.university || "—";
+    document.getElementById("p-verified").value = user.is_verified ? "Yes" : "No";
+  }
+</script>
+</body>
+</html>

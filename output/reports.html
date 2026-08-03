@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports — Authenticity Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="page-content app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> Auth Validator</div>
+    <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="upload.html"><i class="fa-solid fa-upload"></i> Upload</a>
+    <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="reports.html" class="active"><i class="fa-solid fa-file-lines"></i> Reports</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="#" onclick="logout()" style="color:var(--danger);margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main-panel">
+    <div class="topbar">
+      <div class="flex items-center gap-2">
+        <button class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2>Reports &amp; Notifications</h2>
+      </div>
+      <div class="user-chip" data-user-chip></div>
+    </div>
+
+    <div class="panel-body">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="glass-card">
+          <h3 style="margin-top:0;">Verified Documents Ready for Download</h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>File</th><th>Verdict</th><th>Score</th><th></th></tr></thead>
+              <tbody id="reports-body"><tr><td colspan="4" class="text-dim">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3 style="margin-top:0;">Notifications</h3>
+          <div id="notifications-list"><p class="text-dim">Loading...</p></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/report.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  requireAuth();
+  initNavbarUser();
+
+  async function loadReports() {
+    const { ok, data } = await Api.history({ per_page: 20 });
+    const tbody = document.getElementById("reports-body");
+    if (!ok || !data.documents.length) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-dim">No processed documents yet.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.documents.map(d => `
+      <tr>
+        <td>${d.original_filename}</td>
+        <td>${statusBadge(d.status)}</td>
+        <td>${d.authenticity_score ?? "-"}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="downloadReport('${d.id}')"><i class="fa-solid fa-download"></i></button></td>
+      </tr>`).join("");
+  }
+
+  async function loadNotifications() {
+    const { ok, data } = await Api.notifications();
+    const list = document.getElementById("notifications-list");
+    if (!ok || !data.notifications.length) {
+      list.innerHTML = `<p class="text-dim small">No notifications yet.</p>`;
+      return;
+    }
+    list.innerHTML = data.notifications.map(n => `
+      <div class="glass-card" style="padding:14px;margin-bottom:10px;${n.is_read ? 'opacity:0.6;' : ''}">
+        <div class="flex justify-between items-center">
+          <strong class="small">${n.title}</strong>
+          <span class="text-dim small">${new Date(n.created_at).toLocaleString()}</span>
+        </div>
+        <p class="small text-dim" style="margin:6px 0 0;">${n.message}</p>
+      </div>`).join("");
+  }
+
+  loadReports();
+  loadNotifications();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Authenticity Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="page-content app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> Auth Validator</div>
+    <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="upload.html"><i class="fa-solid fa-upload"></i> Upload</a>
+    <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="settings.html" class="active"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="#" onclick="logout()" style="color:var(--danger);margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main-panel">
+    <div class="topbar">
+      <div class="flex items-center gap-2">
+        <button class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2>Settings</h2>
+      </div>
+      <div class="user-chip" data-user-chip></div>
+    </div>
+
+    <div class="panel-body">
+      <div class="glass-card" style="max-width:520px;">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <strong>Dark Mode</strong>
+            <p class="text-dim small" style="margin:4px 0 0;">The interface is cyberpunk-dark by default.</p>
+          </div>
+          <button class="dark-toggle" id="theme-toggle"><i class="fa-solid fa-moon"></i> Dark</button>
+        </div>
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <strong>Email Notifications</strong>
+            <p class="text-dim small" style="margin:4px 0 0;">Get notified when a document finishes processing.</p>
+          </div>
+          <input type="checkbox" checked style="width:auto;">
+        </div>
+        <div class="flex justify-between items-center">
+          <div>
+            <strong>Change Password</strong>
+            <p class="text-dim small" style="margin:4px 0 0;">Reset your password via email OTP.</p>
+          </div>
+          <a href="forgot-password.html" class="btn btn-outline btn-sm">Reset</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  requireAuth();
+  initNavbarUser();
+
+  // Simple light/dark class toggle — theme tokens for a "light" cyberpunk
+  // variant can be extended in style.css under body.light-mode if desired.
+  const toggle = document.getElementById("theme-toggle");
+  toggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    const isDark = !document.body.classList.contains("light-mode");
+    toggle.innerHTML = isDark ? '<i class="fa-solid fa-moon"></i> Dark' : '<i class="fa-solid fa-sun"></i> Light';
+    showToast(isDark ? "Dark mode enabled" : "Light mode enabled");
+  });
+</script>
+</body>
+</html>

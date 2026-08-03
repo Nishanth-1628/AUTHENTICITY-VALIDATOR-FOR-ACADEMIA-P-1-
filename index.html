@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Authenticity Validator for Academia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="page-content">
+  <header class="navbar">
+    <div class="brand"><i class="fa-solid fa-shield-halved"></i> Authenticity Validator</div>
+    <button class="navbar-toggle" onclick="toggleNavbar()"><i class="fa-solid fa-bars"></i></button>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#workflow">Workflow</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow">AI-Powered Academic Integrity Platform</div>
+      <h1 id="typed-heading">Verify Academic Authenticity<br>in Seconds</h1>
+      <p class="lead">
+        Detect AI-generated content, plagiarism, citation issues, and forged certificates
+        with a single upload. Built for students, faculty, and universities who need
+        trustworthy verification at scale.
+      </p>
+      <div class="cta-row">
+        <a href="register.html" class="btn btn-primary">Start Verifying <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="index.html#workflow" class="btn btn-outline">See How It Works</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="num" data-count="12">0</div><div class="label">AI Modules</div></div>
+        <div class="stat-item"><div class="num" data-count="99">0</div><div class="label">% Uptime</div></div>
+        <div class="stat-item"><div class="num" data-count="5">0</div><div class="label">User Roles</div></div>
+        <div class="stat-item"><div class="num" data-count="100">0</div><div class="label">Local &amp; Private</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Capabilities</div>
+        <h2 class="section-title">Everything you need to verify a document</h2>
+        <p class="section-sub">A full AI verification suite covering originality, authorship, citations, and identity documents.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-robot"></i></div>
+          <h3>AI Content Detection</h3>
+          <p class="text-dim small">Stylometric analysis flags likely AI-generated passages using burstiness and lexical-diversity signals.</p>
+        </div>
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-copy"></i></div>
+          <h3>Plagiarism Detection</h3>
+          <p class="text-dim small">TF-IDF similarity search against a reference corpus surfaces overlapping passages instantly.</p>
+        </div>
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-quote-right"></i></div>
+          <h3>Citation Verification</h3>
+          <p class="text-dim small">Detects APA/MLA/numeric citation styles and checks for a matching reference section.</p>
+        </div>
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-spell-check"></i></div>
+          <h3>Grammar Analysis</h3>
+          <p class="text-dim small">Rule-based writing-quality checks score sentence structure and flag common issues.</p>
+        </div>
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-certificate"></i></div>
+          <h3>Certificate Verification</h3>
+          <p class="text-dim small">QR-code and hash-based tamper detection for degree certificates and transcripts.</p>
+        </div>
+        <div class="glass-card hoverable">
+          <div class="feature-icon"><i class="fa-solid fa-gauge-high"></i></div>
+          <h3>Authenticity Score</h3>
+          <p class="text-dim small">A single weighted 0–100 score aggregates every signal into one clear verdict.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Workflow</div>
+        <h2 class="section-title">From upload to verdict in four steps</h2>
+      </div>
+      <div class="grid grid-4">
+        <div class="glass-card hoverable"><h3 style="color:var(--primary)">01</h3><h4>Upload</h4><p class="text-dim small">Drag and drop a PDF, DOC, DOCX, or image — certificates included.</p></div>
+        <div class="glass-card hoverable"><h3 style="color:var(--secondary)">02</h3><h4>Extract</h4><p class="text-dim small">OCR and text extraction pull content from any file type.</p></div>
+        <div class="glass-card hoverable"><h3 style="color:var(--accent)">03</h3><h4>Analyze</h4><p class="text-dim small">AI modules run in parallel: plagiarism, AI-detection, citations, grammar.</p></div>
+        <div class="glass-card hoverable"><h3 style="color:var(--primary)">04</h3><h4>Report</h4><p class="text-dim small">Get an authenticity score, verdict, and a downloadable PDF report.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Pricing</div>
+        <h2 class="section-title">Simple plans for every institution</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="glass-card hoverable">
+          <h3>Student</h3>
+          <div class="stat-item" style="text-align:left;margin:10px 0;"><span class="num" style="font-size:2rem;">Free</span></div>
+          <p class="text-dim small">10 document checks / month, standard AI report.</p>
+          <a href="register.html" class="btn btn-outline btn-block mt-2">Choose Student</a>
+        </div>
+        <div class="glass-card hoverable" style="border-color:var(--primary);">
+          <h3>Faculty</h3>
+          <div class="stat-item" style="text-align:left;margin:10px 0;"><span class="num" style="font-size:2rem;">₹999/mo</span></div>
+          <p class="text-dim small">Unlimited checks, class-wide analytics, export tools.</p>
+          <a href="register.html" class="btn btn-primary btn-block mt-2">Choose Faculty</a>
+        </div>
+        <div class="glass-card hoverable">
+          <h3>University</h3>
+          <div class="stat-item" style="text-align:left;margin:10px 0;"><span class="num" style="font-size:2rem;">Custom</span></div>
+          <p class="text-dim small">Institution-wide dashboard, certificate issuance, admin panel.</p>
+          <a href="register.html" class="btn btn-outline btn-block mt-2">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">FAQ</div>
+        <h2 class="section-title">Frequently asked questions</h2>
+      </div>
+      <div class="grid grid-2">
+        <div class="glass-card"><h4>What file types are supported?</h4><p class="text-dim small">PDF, DOC, DOCX, PNG and JPG — including scanned documents via OCR.</p></div>
+        <div class="glass-card"><h4>Is my data private?</h4><p class="text-dim small">Documents are processed on your own infrastructure; nothing is sent to third parties by default.</p></div>
+        <div class="glass-card"><h4>How is the authenticity score calculated?</h4><p class="text-dim small">A weighted blend of originality, human-likeness, citation accuracy, and grammar quality.</p></div>
+        <div class="glass-card"><h4>Can universities verify certificates?</h4><p class="text-dim small">Yes — the certificate module checks embedded QR codes against a tamper-evident hash.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="glass-card" style="text-align:center;padding:50px;">
+        <h2>Ready to verify your first document?</h2>
+        <p class="text-dim">Create a free account and get your first authenticity report in minutes.</p>
+        <a href="register.html" class="btn btn-primary mt-2">Create Free Account</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      &copy; 2026 Authenticity Validator for Academia · Built for academic integrity
+    </div>
+  </footer>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  // Typed-style heading animation (no external dep required)
+  const heading = document.getElementById("typed-heading");
+  // Animated counters
+  document.querySelectorAll(".stat-item .num").forEach(el => {
+    const target = parseInt(el.dataset.count, 10);
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 40));
+    const timer = setInterval(() => {
+      cur += step;
+      if (cur >= target) { cur = target; clearInterval(timer); }
+      el.textContent = cur;
+    }, 30);
+  });
+</script>
+</body>
+</html>

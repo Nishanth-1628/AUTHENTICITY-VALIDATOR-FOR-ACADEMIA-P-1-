@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Authenticity Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="page-content app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> Auth Validator</div>
+    <a href="dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="upload.html"><i class="fa-solid fa-upload"></i> Upload</a>
+    <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    <div class="sidebar-section-label" id="admin-section-label" style="display:none;">Admin</div>
+    <a href="admin.html" id="admin-link" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+    <a href="#" onclick="logout()" style="color:var(--danger);margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main-panel">
+    <div class="topbar">
+      <div class="flex items-center gap-2">
+        <button class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2>Dashboard</h2>
+      </div>
+      <div class="user-chip" data-user-chip></div>
+    </div>
+
+    <div class="panel-body">
+      <div class="grid grid-4 mb-3" id="stat-cards">
+        <div class="glass-card stat-card"><div class="icon" style="background:rgba(0,229,255,0.15);color:var(--primary);"><i class="fa-solid fa-file"></i></div><div><div class="value" id="stat-total">–</div><div class="label">Total Documents</div></div></div>
+        <div class="glass-card stat-card"><div class="icon" style="background:rgba(0,255,179,0.15);color:var(--accent);"><i class="fa-solid fa-circle-check"></i></div><div><div class="value" id="stat-verified">–</div><div class="label">Verified</div></div></div>
+        <div class="glass-card stat-card"><div class="icon" style="background:rgba(255,77,109,0.15);color:var(--danger);"><i class="fa-solid fa-circle-xmark"></i></div><div><div class="value" id="stat-rejected">–</div><div class="label">Rejected</div></div></div>
+        <div class="glass-card stat-card"><div class="icon" style="background:rgba(255,176,32,0.15);color:var(--warning);"><i class="fa-solid fa-hourglass-half"></i></div><div><div class="value" id="stat-pending">–</div><div class="label">Pending</div></div></div>
+      </div>
+
+      <div class="grid grid-2 mb-3">
+        <div class="glass-card">
+          <h3>Score Overview</h3>
+          <canvas id="scoreChart" height="200"></canvas>
+        </div>
+        <div class="glass-card text-center">
+          <h3>Average Authenticity</h3>
+          <div id="avg-score-ring" class="score-ring-wrap mt-2"></div>
+          <p class="text-dim small mt-2">Across all your analyzed documents</p>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="flex justify-between items-center mb-2">
+          <h3 style="margin:0;">Recent Activity</h3>
+          <a href="history.html" class="small">View all →</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>File</th><th>Type</th><th>Status</th><th>Score</th><th>Date</th></tr></thead>
+            <tbody id="recent-activity-body">
+              <tr><td colspan="5" class="text-dim">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/background.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ai-engine.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>
+  requireAuth();
+  initNavbarUser();
+
+  const user = getUser();
+  if (user && ["admin", "super_admin"].includes(user.role)) {
+    document.getElementById("admin-link").style.display = "flex";
+    document.getElementById("admin-section-label").style.display = "block";
+  }
+
+  async function loadDashboard() {
+    const { ok, data } = await Api.stats();
+    if (!ok) { showToast(data.message || "Failed to load stats", "error"); return; }
+    const s = data.stats;
+    document.getElementById("stat-total").textContent = s.total_documents;
+    document.getElementById("stat-verified").textContent = s.verified;
+    document.getElementById("stat-rejected").textContent = s.rejected;
+    document.getElementById("stat-pending").textContent = s.pending;
+
+    renderScoreRing("#avg-score-ring", Math.round(s.avg_authenticity_score || 0));
+
+    new Chart(document.getElementById("scoreChart"), {
+      type: "bar",
+      data: {
+        labels: ["Avg Authenticity", "Avg Plagiarism %", "Avg AI Content %"],
+        datasets: [{
+          data: [s.avg_authenticity_score, s.avg_plagiarism_percentage, s.avg_ai_content_percentage],
+          backgroundColor: ["#00e5ff", "#7b2ff7", "#00ffb3"],
+          borderRadius: 8,
+        }],
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#9aa3c7" }, grid: { display: false } },
+          y: { ticks: { color: "#9aa3c7" }, grid: { color: "rgba(255,255,255,0.06)" }, beginAtZero: true, max: 100 },
+        },
+      },
+    });
+
+    const hist = await Api.history({ per_page: 6 });
+    const tbody = document.getElementById("recent-activity-body");
+    if (hist.ok && hist.data.documents.length) {
+      tbody.innerHTML = hist.data.documents.map(d => `
+        <tr>
+          <td>${d.original_filename}</td>
+          <td style="text-transform:uppercase;">${d.file_type}</td>
+          <td>${statusBadge(d.status)}</td>
+          <td>${d.authenticity_score ?? "-"}</td>
+          <td class="text-dim small">${new Date(d.created_at).toLocaleDateString()}</td>
+        </tr>`).join("");
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-dim">No documents uploaded yet. <a href="upload.html">Upload one →</a></td></tr>`;
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
